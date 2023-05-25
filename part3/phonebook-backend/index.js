@@ -1,7 +1,18 @@
 const express = require("express")
 const app = express()
+const morgan = require('morgan');
+const cors = require('cors')
 
+
+function logger(req, res, next) {
+  console.log(`${req.method} ${req.url}`);
+  console.log(`REQ content: ${req.body.name}`);
+  next();
+}
+app.use(cors())
 app.use(express.json())
+app.use(cors())
+app.use(morgan('combined'));
 
 let persons = [
   {
@@ -35,8 +46,25 @@ app.get("/api/persons", (req, res) => {
   res.json(persons)
 })
 
-const PORT = 3001
+app.get("/api/person/:id", (req, res) => {
+  console.log(typeof req.params.id)
+  console.log(  persons.find(person=>{
+    return person.id === Number(req.params.id)
+  }))
 
+  res.json(persons.find(person=>{
+    return person.id === Number(req.params.id)
+  }))
+})
+
+app.post("/api/persons", (req, res) =>{
+  //console.log(req.body.content)
+  persons.push(req.body)
+  res.json(persons)
+
+})
+
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
