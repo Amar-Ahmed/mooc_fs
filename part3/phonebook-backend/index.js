@@ -2,6 +2,9 @@ const express = require("express")
 const app = express()
 const morgan = require('morgan');
 const cors = require('cors')
+const mongoose = require('mongoose')
+const Person = require("./models/phonebook")
+
 
 
 function logger(req, res, next) {
@@ -44,25 +47,41 @@ let persons = [
 ]
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons)
+  Person.find({}).then(result => {
+    res.json(result)
+  })
 })
 
 app.get("/api/person/:id", (req, res) => {
   console.log(typeof req.params.id)
-  console.log(  persons.find(person=>{
+  console.log(persons.find(person => {
     return person.id === Number(req.params.id)
   }))
 
-  res.json(persons.find(person=>{
+  res.json(persons.find(person => {
     return person.id === Number(req.params.id)
   }))
 })
 
-app.post("/api/persons", (req, res) =>{
+app.post("/api/persons",  (req, res) => {
   //console.log(req.body.content)
-  persons.push(req.body)
-  res.json(persons)
+  //console.log(Phonebook.)
+  const data = new Person(req.body)
+  console.log(data)
+  console.log(Person)
+  // Person.save.then(result => {
+  //   res.json(result)
+  // })
+  //persons.push(req.body)
 
+  try {
+    const student =  Person.create(req.body);
+    res.status(201).json({
+      student
+    });
+  } catch (error) {
+    return error;
+  }
 })
 
 const PORT = process.env.PORT || 3001
